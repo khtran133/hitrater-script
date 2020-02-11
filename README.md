@@ -29,6 +29,8 @@ These randomly-induced effects upon accuracy scale with rate of fire; spread inc
 
 ![image text](https://imgur.com/Lhiwx1r.png)
 
+A further explanation of mechanics may be found on the [Symthic website](https://sym.gg/), the leading community forum for in-depth explanations of the *Battlefield* franchise's mechanics. I was also a significant contributor to the Symthic website, and assisted in creating visuals and textual explanations of game mechanics. 
+
 ### Simulation:
 
 The “Hitrater” measures these effects of inaccuracy through a Monte Carlo simulation. A set of ranges are designated (e.g. 5, 10, 15, 20 meters, etc.), and each gun is fired 100,000 times at each range to measure the overall effects of spread and horizontal recoil. While a bullet missing or a gun failing to kill is a binary event, the weapon design is ultimately deterministic. With a low number of samples, an unacceptable amount of bias is induced, and 100,000 samples per range was the minimum number of samples necessary to eliminate sampling bias. 
