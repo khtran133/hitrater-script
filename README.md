@@ -48,7 +48,9 @@ In conclusion, this project not only aims to demystify the game’s mechanics to
 **Chart Overview and Assumptions:**
 * Each picture has four charts which are concatenated into one.
 * The top two charts are for aimed down sights fire at center mass, and the bottom two are for hipfire at center mass\*.
-* As the hitrater is a simulation, it assumes perfect control of vertical recoil and recoil patterns, which are human-controlled variables that can be mastered.
+* The left two charts are using the “left-side” customization specializations, generally geared towards close-quarters combat.
+* The right two charts are using the “right-side” customization specializations, generally geared towards long-ranged combat.
+* As the hitrater is a simulation, it assumes perfect control of vertical recoil and recoil patterns, which are player-controlled variables that can be mastered.
 * \*Medium machine gun (“MMG”) charts show “zoomed” bipod (aimed-down-sights [“ADS”] while bipoded) on the ADS charts, and “zoomed hipfire” (ADS from the hip) on the hipfire charts.
 * An MMG’s “unzoomed hipfire” essentially cannot kill at all (less than a 0.0001% probability of killing a 100 health target at 5 meters), and is useless data.
 
