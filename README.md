@@ -107,6 +107,7 @@ While weapon balance in the preceding November 2019 “*Pacific*” Update could
 “Very good content and a great analysis (and with mostly good points considered). Some of your comments are matching my expectations… Very keen to see how the data compares on our end as [I’m] sure we will be making a bunch of tweaks in the future!”
 
 “It’s difficult to get a good opinion without having all of the elements presented at first. It’s also not very easy for the majority of players to get a good understanding of the intricate gunplay systems (that) come into play to measure how a given weapon performs.”
+
 \- Florian le Bihan, Core Gameplay Designer at EA DICE
 
 “[The Hitrater project] is probably the best analysis of [*Battlefield V’s*] weapon design. It really shows a complete understanding of the game’s mechanics, and displays them in an easy to understand format. This is the definitive way to visualize weapon performance in Battlefield.”
