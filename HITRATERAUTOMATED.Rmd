@@ -1,0 +1,105 @@
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(splitstackshape)
+library(ggplot2)
+library(ggthemes)
+library(gridExtra)
+library(grid)
+library(ggpubr)
+library(cowplot)
+library(shadowtext)
+library(plyr)
+library(easyGgplot2)
+library(mclust)
+library(parallel)
+
+```
+
+```{r}
+## list guns
+list <- list.files(pattern = ".+[^p]{1}.csv")
+
+## multi-core bonanza
+cluster_mc <- makeCluster(detectCores() - 1)
+
+## create function where 'list' values are input
+
+## current loop
+for (i in 1:length(list)) {
+  s <- read.csv(list[i])
+  name <- strsplit(list[i], "[.]")[[1]][1]
+  
+  ## vectors for breaks, labels
+  breaks_hip <- unique(s$range[s$type == 'HIP']) ## ADS breaks
+  breaks_ads <- unique(s$range[s$type == 'ADS']) ## HIP breaks
+  labels_hip <- paste(unique(s$range[s$type == 'HIP']), 'm', sep = '') ## ADS labels
+  labels_ads <- paste(unique(s$range[s$type == 'ADS']), 'm', sep = '') ## HIP labels
+  breaks_y <- c(0,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000,110000,120000,125000) ## Y-axis breaks
+  labels_y <- c('0','10K','20K','30K','40K','50K','60K','70K','80K','90K','100K','','','') ## Y-axis labels
+  symthic_palette <- c('#194732','#016638','#029954','#04ff8d','#4fffaf','#81ffc6','#ccffe8','#fad99d','#f8c66c','#f6b33b','#f4a00b','#cc7a00','#b26b00','#995b00')
+  s
+  s$no_kill <- ifelse(s$FTK < 0, 1, 0)
+  s_k <- subset(s, s$no_kill < 1)
+  s1 <- aggregate(freq ~ range + type + tree, data = s_k, sum)
+  colnames(s1) <- c('range', 'type', 'tree', 'freqsum')
+  s_k <- s_k %>% right_join(s1, by = c('range', 'type', 'tree'))
+  s_k$e_ftk <- round(s_k$avg*100000/(s_k$freqsum), 2)
+  
+  ### to-do
+  ### remove legends from left sides, frequency labels from right sides
+  ### improve visibility of U[FTK]
+  
+  ## plotting
+  s_L_HIP <- ggplot(aes(x = range, y = freq, fill = factor(FTK)), data = s_k[which(s_k$type == 'HIP'  & s_k$tree == 'LEFT'),]) 
+  s_L_HIP <- s_L_HIP + geom_bar(stat = 'identity', width = 4.5)
+  s_L_HIP <- s_L_HIP + scale_x_continuous(breaks = breaks_hip, label = labels_hip) + scale_y_continuous(limits = c(0,125000), breaks = breaks_y, label = labels_y) 
+  s_L_HIP <- s_L_HIP + geom_text(aes(y = 125000, label = 'E[FTK]'), color = 'black', fontface = 'bold', size = 2.5)
+  s_L_HIP <- s_L_HIP + geom_text(aes(y = 120000, label = e_ftk), color = 'black', fontface = 'bold', size = 2.5)
+  s_L_HIP <- s_L_HIP + geom_shadowtext(aes(y = avg*1000 + 5000, label = 'U[FTK]'), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 3.5)
+  s_L_HIP <- s_L_HIP + geom_shadowtext(aes(y = avg*1000, label = avg), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 3.5)
+  s_L_HIP <- s_L_HIP + scale_fill_manual(values = symthic_palette) + theme(plot.background = element_rect(fill = 'white'), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),)
+  s_L_HIP <- ggplot2.customize(s_L_HIP, mainTitle = paste(name, 'Full Left, Hipfire', sep = ' '), xtitle = 'Range', ytitle = 'Frequency', legendTitle = 'FTK', mainTitleFont = c(14,'bold', 'black'), xtitleFont = c(14,'bold', 'black'), ytitleFont = c(14,'bold', 'black'), xTickLabelFont = c(10, 'bold', 'black'), yTickLabelFont = c(10, 'bold', 'black'), backgroundColor = '#f3f3f3', axisLine = c(0.333, 'solid', 'black'), legendTitleFont = c(12, 'bold', 'black'), legendBackground = c('white', 0.5, 'solid', 'white' ))
+  
+  s_R_HIP <- ggplot(aes(x = range, y = freq, fill = factor(FTK)), data = s_k[which(s_k$type == 'HIP'  & s_k$tree == 'RIGHT'),]) 
+  s_R_HIP <- s_R_HIP + geom_bar(stat = 'identity', width = 4.5)
+  s_R_HIP <- s_R_HIP + scale_x_continuous(breaks = breaks_hip, label = labels_hip) + scale_y_continuous(limits = c(0,125000), breaks = breaks_y, label = labels_y) 
+  s_R_HIP <- s_R_HIP + geom_text(aes(y = 125000, label = 'E[FTK]'), color = 'black', fontface = 'bold', size = 2.5)
+  s_R_HIP <- s_R_HIP + geom_text(aes(y = 120000, label = e_ftk), color = 'black', fontface = 'bold', size = 2.5)
+  s_R_HIP <- s_R_HIP + geom_shadowtext(aes(y = avg*1000 + 5000, label = 'U[FTK]'), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 3.5)
+  s_R_HIP <- s_R_HIP + geom_shadowtext(aes(y = avg*1000, label = avg), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 3.5)
+  s_R_HIP <- s_R_HIP + scale_fill_manual(values = symthic_palette) + theme(plot.background = element_rect(fill = 'white'), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),)
+  s_R_HIP <- ggplot2.customize(s_R_HIP, mainTitle = paste(name, 'Full Right, Hipfire', sep = ' '), xtitle = 'Range', ytitle = 'Frequency', legendTitle = 'FTK', mainTitleFont = c(14,'bold', 'black'), xtitleFont = c(14,'bold', 'black'), ytitleFont = c(14,'bold', 'black'), xTickLabelFont = c(10, 'bold', 'black'), yTickLabelFont = c(10, 'bold', 'black'), backgroundColor = '#f3f3f3', axisLine = c(0.333, 'solid', 'black'), legendTitleFont = c(12, 'bold', 'black'), legendBackground = c('white', 0.5, 'solid', 'white' ))
+  
+  s_L_ADS <- ggplot(aes(x = factor(range), y = freq, fill = factor(FTK)), data = s_k[which(s_k$type == 'ADS'  & s_k$tree == 'LEFT'),]) 
+  s_L_ADS <- s_L_ADS + geom_bar(stat = 'identity', width = 0.9) 
+  s_L_ADS <- s_L_ADS + scale_x_discrete(breaks = breaks_ads, label = labels_ads) + scale_y_continuous(limits = c(0,125000), breaks = breaks_y, label = labels_y) 
+  s_L_ADS <- s_L_ADS + geom_text(aes(y = 125000, label = 'E[FTK]'), color = 'black', fontface = 'bold', size = 2.5)
+  s_L_ADS <- s_L_ADS + geom_text(aes(y = 120000, label = e_ftk), color = 'black', fontface = 'bold', size = 2.5)
+  s_L_ADS <- s_L_ADS + geom_shadowtext(aes(y = avg*1000 + 5000, label = 'U[FTK]'), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 2.5)
+  s_L_ADS <- s_L_ADS + geom_shadowtext(aes(y = avg*1000, label = avg), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 2.5)
+  s_L_ADS <- s_L_ADS + scale_fill_manual(values = symthic_palette) + theme(plot.background = element_rect(fill = 'white'), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),)
+  s_L_ADS <- ggplot2.customize(s_L_ADS, mainTitle = paste(name, 'Full Left, ADS', sep = ' '), xtitle = 'Range', ytitle = 'Frequency', legendTitle = 'FTK', mainTitleFont = c(14,'bold', 'black'), xtitleFont = c(14,'bold', 'black'), ytitleFont = c(14,'bold', 'black'), xTickLabelFont = c(8, 'bold', 'black'), yTickLabelFont = c(10, 'bold', 'black'), backgroundColor = '#f3f3f3', axisLine = c(0.333, 'solid', 'black'), legendTitleFont = c(12, 'bold', 'black'), legendBackground = c('white', 0.5, 'solid', 'white' ))
+  
+  s_R_ADS <- ggplot(aes(x = factor(range), y = freq, fill = factor(FTK)), data = s_k[which(s_k$type == 'ADS'  & s_k$tree == 'RIGHT'),]) 
+  s_R_ADS <- s_R_ADS + geom_bar(stat = 'identity', width = 0.9) 
+  s_R_ADS <- s_R_ADS + scale_x_discrete(breaks = breaks_ads, label = labels_ads) + scale_y_continuous(limits = c(0,125000), breaks = breaks_y, label = labels_y) 
+  s_R_ADS <- s_R_ADS + geom_text(aes(y = 125000, label = 'E[FTK]'), color = 'black', fontface = 'bold', size = 2.5)
+  s_R_ADS <- s_R_ADS + geom_text(aes(y = 120000, label = e_ftk), color = 'black', fontface = 'bold', size = 2.5)
+  s_R_ADS <- s_R_ADS + geom_shadowtext(aes(y = avg*1000 + 5000, label = 'U[FTK]'), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 2.5)
+  s_R_ADS <- s_R_ADS + geom_shadowtext(aes(y = avg*1000, label = avg), gp = gpar(cex = 6.666, col = '#c7c7c7'), bg.colour = '#454545', fontface = 'bold', size = 2.5)
+  s_R_ADS <- s_R_ADS + scale_fill_manual(values = symthic_palette) + theme(plot.background = element_rect(fill = 'white'), panel.grid.major = element_blank(), panel.grid.minor = element_blank(),)
+  s_R_ADS <- ggplot2.customize(s_R_ADS, mainTitle = paste(name, 'Full Right, ADS', sep = ' '), xtitle = 'Range', ytitle = 'Frequency', legendTitle = 'FTK', mainTitleFont = c(14,'bold', 'black'), xtitleFont = c(14,'bold', 'black'), ytitleFont = c(14,'bold', 'black'), xTickLabelFont = c(8, 'bold', 'black'), yTickLabelFont = c(10, 'bold', 'black'), backgroundColor = '#f3f3f3', axisLine = c(0.333, 'solid', 'black'), legendTitleFont = c(12, 'bold', 'black'), legendBackground = c('white', 0.5, 'solid', 'white' ))
+  
+  sADSComp <- ggarrange(s_L_ADS, s_R_ADS, heights = c(5,5), ncol = 2, nrow = 1, align = 'h')
+  sHipComp <- ggarrange(s_L_HIP, s_R_HIP, heights = c(6,6), ncol = 2, nrow = 1, align = 'h')
+  sComp <- ggarrange(sADSComp, sHipComp, heights = c(5,5), ncol = 1, nrow = 2, align = 'v')
+  
+  message(name)
+  ggsave(paste(name, 'Comp.png', sep = ' '), plot = sComp, width = 18, height = 16, units = 'in', dpi = 450)
+  write.csv(s_k, file = paste(name, 'Comp.csv', sep = ' '))
+}
+
+## end multi-core bonanza
+stopCluster(cluster_mc)
+```
