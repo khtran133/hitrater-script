@@ -10,7 +10,7 @@ The “Hitrater” project was done for EA DICE’s *Battlefield V*, as a means 
 
 As a first-person shooter, the most important variable to measure here is damage output - how quickly a weapon can kill an enemy player - and the “Hitrater” project measures this in “frames”. As the game operates on a 60Hz logic loop, it would be disingenuous to represent this through seconds, or milliseconds, despite the fact that these are measures of times that humans tend to think in. 
 
-Within each weapon type, damage models tend to be constant; each assault rifle has the same damage per bullet at each range, as would each machine gun. Due to this fact, a common misconception is that the faster firing weapon would always reign supreme. A major goal of the “Hitrater” project is to clear this misconception, through visualizing the effects of randomly-induced inaccuracy.
+Within each weapon type, damage models tend to be constant; each assault rifle has the same damage per bullet at each range, as would each machine gun. Due to this fact, a common misconception is that the faster firing weapon would always reign supreme. A major goal of the “Hitrater” project is to clear this misconception, through visualizing the effects of randomly-induced inaccuracy, or "hitrate".
 
 While damage models and rates of fire have an effect on damage output, “spread”, a mechanic introduced to emulate a real-life weapon’s minute-of-angle (MoA) accuracy, is used, alongside horizontal recoil.  Simulating these effects required reverse-engineering the game’s code from the game’s files.
 
