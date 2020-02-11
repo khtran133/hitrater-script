@@ -125,4 +125,8 @@ A more qualitative limitation lies in how to measure consistency itself - *what 
 
 For example, in the November 2019 “*Pacific*” Update, the 514 RPM Ribeyrolles and the 770 RPM M1907 had the same expected FTK at 50 meters. I would consider the Ribeyrolles to be the superior weapon at this range, as it is more consistent and is considerably easier to use, and the M1907 is more likely to kill slower than the Ribeyrolles at this range. However, there is also a significant probability of the M1907 killing *faster* than the Ribeyrolles at this range as well. The value of weapon consistency may be subjective from player to player; how willing should a player be to trade a chance of a faster time-to-kill for a higher lower bound of performance and greater ease-of-use? It is difficult to quantify the distribution of FTK instances at each range in a meaningful manner, as different players will always have different priorities. 
 
+![image text](https://imgur.com/hlQjVNh.png)
+
+![image text](https://imgur.com/sfKOaYy.png)
+
 The next step in the “Hitrater” project would be in the development of a web-based tool, ideally with either Power BI or RShiny. An accessible and interactive tool where users may customize the visualization and easily sort through various weapons without having to resort to shuffling through dozens of `.png` files would be a considerable improvement.
